@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "QuickFix",
+    "slug": "quickfix-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0D13"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.servicehub.quickfix",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Necesitamos tu ubicación para encontrar profesionales cercanos.",
+        "NSCameraUsageDescription": "Para tomar fotos durante el servicio.",
+        "NSPhotoLibraryUsageDescription": "Para subir fotos a tu perfil."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0D13"
+      },
+      "package": "com.servicehub.quickfix",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-location",
+      "expo-notifications",
+      "expo-camera",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "appId": "QUICKFIX",
+      "appName": "QuickFix",
+      "appColor": "#1B5EF7",
+      "appIcon": "🔧",
+      "apiUrl": "https://api.servicehub.app/api/v1",
+      "eas": {
+        "projectId": "proyecto-quickfix-app"
+      }
+    }
+  }
+}
