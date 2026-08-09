@@ -3,606 +3,933 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>QuickFix — Técnicos a domicilio</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<title>QuickFix — Pisos, Pintura & Obra en Bogotá</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Figtree:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
-  :root {
-    --blue: #1B5EF7;
-    --blue-dark: #0D3FBF;
-    --blue-light: #E8EFFE;
-    --orange: #FF6B2B;
-    --dark: #0A0D14;
-    --dark2: #141824;
-    --gray: #6B7280;
-    --gray-light: #F4F5F7;
-    --white: #FFFFFF;
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--dark);
-    color: var(--white);
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+/* ── TOKENS ── */
+:root {
+  --r: 14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+  --ease: cubic-bezier(.4,0,.2,1);
+  --spring: cubic-bezier(.34,1.56,.64,1);
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 5%;
-    background: rgba(10,13,20,0.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-  .nav-logo span { color: var(--orange); }
-  .nav-logo .dot { width: 8px; height: 8px; background: var(--orange); border-radius: 50%; display: inline-block; }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
-  .nav-links a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
-  .nav-links a:hover { color: var(--white); }
-  .nav-cta { background: var(--blue); color: var(--white); border: none; padding: 0.6rem 1.4rem; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background .2s, transform .15s; }
-  .nav-cta:hover { background: var(--blue-dark); transform: translateY(-1px); }
-  .nav-mobile-toggle { display: none; background: none; border: 1px solid rgba(255,255,255,0.15); color: var(--white); padding: 0.5rem 0.7rem; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+  /* Light */
+  --bg:       #F2F2F7;
+  --bg2:      #FFFFFF;
+  --bg3:      #F2F2F7;
+  --bg-card:  #FFFFFF;
+  --sep:      rgba(60,60,67,.18);
+  --text:     #1C1C1E;
+  --text2:    #3A3A3C;
+  --muted:    #8E8E93;
+  --accent:   #007AFF;
+  --accent2:  #0051D5;
+  --green:    #34C759;
+  --orange:   #FF9500;
+  --red:      #FF3B30;
+  --shadow:   0 2px 20px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+}
+html.dark {
+  --bg:       #000000;
+  --bg2:      #1C1C1E;
+  --bg3:      #2C2C2E;
+  --bg-card:  #1C1C1E;
+  --sep:      rgba(255,255,255,.12);
+  --text:     #FFFFFF;
+  --text2:    #EBEBF5;
+  --muted:    #8E8E93;
+  --accent:   #0A84FF;
+  --accent2:  #409CFF;
+  --green:    #30D158;
+  --orange:   #FF9F0A;
+  --shadow:   0 2px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.3);
+}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    padding: 8rem 5% 4rem;
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute; inset: 0; z-index: 0;
-    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(27,94,247,0.18) 0%, transparent 70%),
-                radial-gradient(ellipse 50% 40% at 85% 70%, rgba(255,107,43,0.12) 0%, transparent 60%),
-                var(--dark);
-  }
-  .hero-grid {
-    position: absolute; inset: 0; z-index: 0;
-    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-  }
-  .hero-content { position: relative; z-index: 1; max-width: 680px; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(27,94,247,0.15); border: 1px solid rgba(27,94,247,0.3);
-    color: #7BA8FF; font-size: 0.8rem; font-weight: 500;
-    padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.5rem;
-    animation: fadeUp .6s ease both;
-  }
-  .hero-badge .live-dot { width: 7px; height: 7px; background: #4ADE80; border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(2.8rem, 7vw, 5rem);
-    font-weight: 800;
-    line-height: 1.05;
-    margin-bottom: 1.25rem;
-    animation: fadeUp .6s ease .1s both;
-  }
-  .hero h1 em { font-style: normal; color: var(--orange); }
-  .hero h1 .hl { 
-    background: linear-gradient(90deg, var(--blue), #7BA8FF);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .hero p {
-    font-size: 1.1rem; color: rgba(255,255,255,0.6); line-height: 1.7;
-    max-width: 520px; margin-bottom: 2.5rem;
-    animation: fadeUp .6s ease .2s both;
-  }
-  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp .6s ease .3s both; }
-  .btn-primary {
-    background: var(--blue); color: var(--white);
-    padding: 0.9rem 2rem; border-radius: 100px; border: none;
-    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; gap: 8px;
-    transition: all .2s; text-decoration: none;
-  }
-  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,94,247,0.4); }
-  .btn-secondary {
-    background: transparent; color: var(--white);
-    padding: 0.9rem 2rem; border-radius: 100px; border: 1px solid rgba(255,255,255,0.2);
-    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; gap: 8px;
-    transition: all .2s; text-decoration: none;
-  }
-  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
-  .hero-stats { display: flex; gap: 2.5rem; margin-top: 3rem; animation: fadeUp .6s ease .4s both; flex-wrap: wrap; }
-  .stat-item { }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--white); }
-  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Figtree',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:background .3s var(--ease), color .3s var(--ease);
+  overflow-x:hidden;
+}
 
-  /* PHONE MOCKUP */
-  .hero-visual {
-    position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
-    z-index: 1; animation: floatIn .8s ease .4s both;
-  }
-  .phone-frame {
-    width: 260px; height: 530px;
-    background: var(--dark2);
-    border-radius: 40px;
-    border: 2px solid rgba(255,255,255,0.1);
-    padding: 16px;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-    position: relative; overflow: hidden;
-  }
-  .phone-notch { width: 80px; height: 22px; background: var(--dark); border-radius: 0 0 14px 14px; margin: 0 auto 10px; }
-  .phone-screen { height: 100%; display: flex; flex-direction: column; gap: 8px; }
-  .ph-header { background: rgba(27,94,247,0.12); border-radius: 12px; padding: 12px; }
-  .ph-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .ph-title { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; }
-  .ph-avatar { width: 26px; height: 26px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; }
-  .ph-search { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 10px; font-size: 0.65rem; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 6px; }
-  .ph-cats { display: flex; gap: 6px; overflow-x: hidden; }
-  .ph-cat { background: rgba(27,94,247,0.2); border-radius: 20px; padding: 5px 10px; font-size: 0.6rem; white-space: nowrap; flex-shrink: 0; }
-  .ph-cat.active { background: var(--blue); }
-  .ph-cards { display: flex; flex-direction: column; gap: 7px; flex: 1; }
-  .ph-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px; display: flex; gap: 8px; align-items: center; border: 1px solid rgba(255,255,255,0.06); }
-  .ph-card-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-  .ph-card-info { flex: 1; }
-  .ph-card-name { font-size: 0.65rem; font-weight: 500; margin-bottom: 2px; }
-  .ph-card-meta { font-size: 0.58rem; color: rgba(255,255,255,0.4); }
-  .ph-card-price { font-size: 0.65rem; font-weight: 600; color: var(--orange); }
-  .ph-stars { color: #FBBF24; font-size: 0.55rem; }
-  .ph-cta { background: var(--blue); border-radius: 10px; padding: 10px; text-align: center; font-size: 0.7rem; font-weight: 600; margin-top: auto; }
-  @keyframes floatIn { from{opacity:0;transform:translateY(-40%) translateX(40px)} to{opacity:1;transform:translateY(-50%) translateX(0)} }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  height:56px;
+  background:rgba(var(--bg-rgb, 242,242,247),.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--sep);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 20px;
+  transition:background .3s;
+}
+html.dark nav { background:rgba(0,0,0,.85); }
+.nav-logo {
+  font-family:'DM Serif Display',serif;
+  font-size:1.25rem;
+  color:var(--text);
+  text-decoration:none;
+  letter-spacing:-.02em;
+}
+.nav-logo span { color:var(--accent); }
+.nav-right { display:flex; align-items:center; gap:10px; }
+.nav-btn {
+  height:34px; padding:0 14px;
+  background:var(--accent);
+  color:#fff; border:none;
+  border-radius:100px;
+  font-family:'Figtree',sans-serif;
+  font-size:0.82rem; font-weight:600;
+  cursor:pointer; transition:all .2s var(--ease);
+  white-space:nowrap;
+}
+.nav-btn:hover { background:var(--accent2); transform:scale(1.03); }
+.icon-btn {
+  width:34px; height:34px;
+  background:var(--bg3);
+  border:1px solid var(--sep);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .2s;
+  color:var(--text); font-size:.85rem;
+}
+.icon-btn:hover { background:var(--sep); }
+.lang-toggle {
+  display:flex;
+  background:var(--bg3);
+  border:1px solid var(--sep);
+  border-radius:100px;
+  overflow:hidden;
+  font-size:0.75rem; font-weight:700;
+}
+.lt { padding:5px 10px; border:none; background:none; color:var(--muted); cursor:pointer; font-family:'Figtree',sans-serif; font-weight:700; transition:all .2s; }
+.lt.on { background:var(--accent); color:#fff; border-radius:100px; }
 
-  /* SERVICES */
-  .section { padding: 5rem 5%; }
-  .section-tag { font-size: 0.8rem; font-weight: 500; color: var(--blue); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 0.75rem; display: block; }
-  .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.15; margin-bottom: 1rem; }
-  .section-sub { color: rgba(255,255,255,0.5); font-size: 1rem; line-height: 1.7; max-width: 520px; }
+/* ── HERO ── */
+.hero {
+  min-height:100svh;
+  padding:90px 20px 60px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-items:center;
+  max-width:1100px;
+  margin:0 auto;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  background:var(--bg-card);
+  border:1px solid var(--sep);
+  border-radius:100px;
+  padding:6px 14px 6px 8px;
+  font-size:.78rem; font-weight:600;
+  color:var(--muted);
+  margin-bottom:20px;
+  box-shadow:var(--shadow);
+  animation:fadeUp .6s var(--ease) both;
+}
+.badge-dot {
+  width:8px; height:8px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 
-  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: rgba(255,255,255,0.07); border-radius: var(--radius); overflow: hidden; margin-top: 3rem; border: 1px solid rgba(255,255,255,0.07); }
-  .service-card {
-    background: var(--dark2); padding: 2rem 1.75rem;
-    transition: background .2s;
-    cursor: pointer; position: relative;
-  }
-  .service-card:hover { background: rgba(27,94,247,0.08); }
-  .service-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
-  .service-card h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .service-card p { font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 1rem; }
-  .service-card .s-price { font-size: 0.8rem; color: var(--orange); font-weight: 500; }
-  .service-tag { position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(27,94,247,0.15); color: #7BA8FF; font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; }
+.hero h1 {
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.6rem,5.5vw,4.2rem);
+  line-height:1.08;
+  letter-spacing:-.03em;
+  margin-bottom:16px;
+  animation:fadeUp .6s var(--ease) .1s both;
+}
+.hero h1 em { font-style:italic; color:var(--accent); }
+.hero-sub {
+  font-size:1.05rem; font-weight:400;
+  color:var(--muted);
+  line-height:1.7;
+  max-width:440px;
+  margin-bottom:32px;
+  animation:fadeUp .6s var(--ease) .2s both;
+}
+.hero-actions {
+  display:flex; gap:10px; flex-wrap:wrap;
+  animation:fadeUp .6s var(--ease) .3s both;
+}
+.btn-primary {
+  height:48px; padding:0 24px;
+  background:var(--accent);
+  color:#fff; border:none;
+  border-radius:100px;
+  font-family:'Figtree',sans-serif;
+  font-size:1rem; font-weight:600;
+  cursor:pointer;
+  display:flex; align-items:center; gap:8px;
+  transition:all .25s var(--ease);
+  text-decoration:none;
+  box-shadow:0 4px 16px rgba(0,122,255,.35);
+}
+.btn-primary:hover { background:var(--accent2); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,122,255,.45); }
+.btn-ghost {
+  height:48px; padding:0 24px;
+  background:var(--bg-card);
+  color:var(--text); border:1px solid var(--sep);
+  border-radius:100px;
+  font-family:'Figtree',sans-serif;
+  font-size:1rem; font-weight:600;
+  cursor:pointer;
+  display:flex; align-items:center; gap:8px;
+  transition:all .25s var(--ease);
+  text-decoration:none;
+  box-shadow:var(--shadow);
+}
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-2px); }
 
-  /* HOW IT WORKS */
-  .how-section { padding: 5rem 5%; background: var(--dark2); }
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 3rem; position: relative; }
-  .steps::before {
-    content: ''; position: absolute; top: 28px; left: 14%; right: 14%;
-    height: 1px; background: linear-gradient(90deg, transparent, rgba(27,94,247,0.4), rgba(27,94,247,0.4), transparent);
-    pointer-events: none;
-  }
-  .step { text-align: center; position: relative; }
-  .step-num {
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--dark); border: 2px solid rgba(27,94,247,0.5);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800;
-    color: var(--blue); margin: 0 auto 1.25rem;
-    position: relative; z-index: 1;
-  }
-  .step h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .step p { font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.hero-stats {
+  display:flex; gap:28px;
+  margin-top:36px;
+  animation:fadeUp .6s var(--ease) .4s both;
+}
+.stat-n { font-family:'DM Serif Display',serif; font-size:1.8rem; color:var(--text); }
+.stat-l { font-size:.75rem; font-weight:600; color:var(--muted); margin-top:2px; }
 
-  /* EXPERTS / AFILIACION */
-  .experts-section { padding: 5rem 5%; position: relative; overflow: hidden; }
-  .experts-section::before {
-    content: ''; position: absolute; top: 0; right: 0;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .experts-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-  .experts-plans { display: flex; flex-direction: column; gap: 1rem; }
-  .plan-card {
-    background: var(--dark2); border: 1px solid rgba(255,255,255,0.07);
-    border-radius: var(--radius); padding: 1.5rem;
-    transition: all .2s; cursor: pointer;
-  }
-  .plan-card:hover { border-color: rgba(27,94,247,0.4); transform: translateX(4px); }
-  .plan-card.featured { border-color: var(--blue); background: rgba(27,94,247,0.08); }
-  .plan-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-  .plan-name-w h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
-  .plan-name-w p { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 3px; }
-  .plan-price-w { text-align: right; }
-  .plan-price-w .price { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
-  .plan-price-w .mo { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
-  .plan-features { display: flex; flex-wrap: wrap; gap: 6px; }
-  .plan-feat { background: rgba(255,255,255,0.06); font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; color: rgba(255,255,255,0.6); }
-  .pop-badge { background: var(--blue); color: var(--white); font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+/* ── BANNER ROTATIVO ── */
+.banner-wrap {
+  position:relative;
+  border-radius:var(--r-xl);
+  overflow:hidden;
+  aspect-ratio:4/3;
+  box-shadow:var(--shadow-lg);
+  animation:fadeUp .8s var(--ease) .3s both;
+}
+.banner-slide {
+  position:absolute; inset:0;
+  opacity:0;
+  transition:opacity .8s var(--ease);
+  background:var(--bg3);
+  display:flex; align-items:center; justify-content:center;
+}
+.banner-slide.active { opacity:1; }
+.banner-slide img {
+  width:100%; height:100%;
+  object-fit:cover;
+}
+.banner-placeholder {
+  width:100%; height:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:12px;
+  background:linear-gradient(135deg, var(--bg3), var(--bg2));
+}
+.banner-placeholder i { font-size:3rem; color:var(--accent); opacity:.5; }
+.banner-placeholder span { font-size:.82rem; color:var(--muted); font-weight:500; }
+.banner-dots {
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+  display:flex; gap:6px;
+}
+.bdot {
+  width:6px; height:6px; border-radius:3px;
+  background:rgba(255,255,255,.5);
+  transition:all .3s var(--ease);
+  cursor:pointer;
+}
+.bdot.active { width:20px; background:#fff; }
+.banner-label {
+  position:absolute; bottom:36px; left:16px; right:16px;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(12px);
+  border-radius:var(--r);
+  padding:10px 14px;
+  color:#fff;
+  font-size:.8rem; font-weight:600;
+}
 
-  /* TESTIMONIALS */
-  .reviews-section { padding: 5rem 5%; background: var(--dark2); }
-  .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 3rem; }
-  .review-card { background: var(--dark); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 1.5rem; }
-  .review-stars { color: #FBBF24; margin-bottom: 0.75rem; font-size: 0.9rem; }
-  .review-text { font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 1.25rem; }
-  .review-author { display: flex; align-items: center; gap: 10px; }
-  .review-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
-  .review-name { font-size: 0.875rem; font-weight: 500; }
-  .review-role { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+/* ── SECTION COMMONS ── */
+section { padding:64px 20px; }
+.section-inner { max-width:1100px; margin:0 auto; }
+.section-tag {
+  font-size:.72rem; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent);
+  margin-bottom:8px; display:block;
+}
+.section-title {
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.8rem,4vw,2.8rem);
+  line-height:1.15; letter-spacing:-.03em;
+  margin-bottom:10px;
+}
+.section-sub { font-size:1rem; color:var(--muted); max-width:500px; line-height:1.7; }
 
-  /* CTA FINAL */
-  .cta-section {
-    padding: 6rem 5%;
-    text-align: center;
-    position: relative; overflow: hidden;
-  }
-  .cta-section::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(27,94,247,0.15) 0%, transparent 70%);
-  }
-  .cta-section h2 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; position: relative; }
-  .cta-section p { color: rgba(255,255,255,0.55); font-size: 1.05rem; margin-bottom: 2.5rem; position: relative; }
-  .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
-  .app-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: var(--white); transition: all .2s; }
-  .app-btn:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
-  .app-btn-icon { font-size: 1.5rem; }
-  .app-btn-text { text-align: left; }
-  .app-btn-text span { display: block; font-size: 0.7rem; color: rgba(255,255,255,0.5); }
-  .app-btn-text strong { font-size: 0.9rem; }
+/* ── SERVICES ── */
+.services-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:14px;
+  margin-top:36px;
+}
+.service-card {
+  background:var(--bg-card);
+  border:1px solid var(--sep);
+  border-radius:var(--r-lg);
+  padding:26px;
+  transition:all .25s var(--ease);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.service-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(0,122,255,.06),transparent);
+  opacity:0; transition:opacity .25s;
+}
+.service-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:rgba(0,122,255,.25); }
+.service-card:hover::before { opacity:1; }
+.svc-icon {
+  width:52px; height:52px;
+  background:var(--bg3);
+  border-radius:var(--r);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; color:var(--accent);
+  margin-bottom:16px;
+  transition:background .25s;
+}
+.service-card:hover .svc-icon { background:var(--accent); color:#fff; }
+.svc-title { font-size:1.05rem; font-weight:700; margin-bottom:6px; }
+.svc-desc { font-size:.875rem; color:var(--muted); line-height:1.65; margin-bottom:16px; }
+.svc-items { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
+.svc-tag {
+  font-size:.72rem; font-weight:600;
+  padding:4px 10px; border-radius:100px;
+  background:var(--bg3); color:var(--muted);
+  border:1px solid var(--sep);
+  transition:all .2s;
+}
+.service-card:hover .svc-tag { background:rgba(0,122,255,.1); color:var(--accent); border-color:rgba(0,122,255,.2); }
+.svc-cta {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.85rem; font-weight:700;
+  color:var(--accent); text-decoration:none;
+  transition:gap .2s;
+}
+.svc-cta:hover { gap:10px; }
 
-  /* FOOTER */
-  footer { border-top: 1px solid rgba(255,255,255,0.07); padding: 2rem 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; }
-  footer .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; }
-  footer .logo span { color: var(--orange); }
-  footer p { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
-  footer nav a { font-size: 0.8rem; color: rgba(255,255,255,0.4); text-decoration: none; margin-left: 1.5rem; }
-  footer nav a:hover { color: var(--white); }
+/* ── HOW IT WORKS ── */
+.how-section { background:var(--bg2); }
+.steps-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:14px; margin-top:36px;
+}
+.step-card {
+  background:var(--bg-card);
+  border:1px solid var(--sep);
+  border-radius:var(--r-lg);
+  padding:26px;
+  box-shadow:var(--shadow);
+}
+.step-num {
+  width:40px; height:40px;
+  background:var(--accent);
+  border-radius:var(--r);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:1rem; color:#fff;
+  margin-bottom:14px;
+}
+.step-title { font-size:.95rem; font-weight:700; margin-bottom:6px; }
+.step-desc { font-size:.84rem; color:var(--muted); line-height:1.65; }
 
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    .hero-visual { display: none; }
-    .experts-inner { grid-template-columns: 1fr; }
-    .nav-links { display: none; }
-    .nav-mobile-toggle { display: block; }
-    .steps::before { display: none; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
-    footer nav { margin-top: 0.5rem; }
-    footer nav a { margin: 0 0.75rem; }
-  }
-  @media (max-width: 480px) {
-    nav { padding: 1rem 4%; }
-    .hero { padding: 7rem 4% 3rem; }
-    .section, .how-section, .experts-section, .reviews-section, .cta-section { padding: 3.5rem 4%; }
-    .hero h1 { font-size: 2.4rem; }
-    .hero-stats { gap: 1.5rem; }
-    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-    .hero-actions { flex-direction: column; }
-  }
+/* ── TESTIMONIALS ── */
+.testi-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px; margin-top:36px;
+}
+.testi-card {
+  background:var(--bg-card);
+  border:1px solid var(--sep);
+  border-radius:var(--r-lg);
+  padding:22px;
+  box-shadow:var(--shadow);
+  transition:all .25s var(--ease);
+}
+.testi-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+.testi-media {
+  width:100%; aspect-ratio:16/9;
+  border-radius:var(--r);
+  overflow:hidden;
+  background:var(--bg3);
+  margin-bottom:16px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.testi-media i { font-size:2.5rem; color:var(--muted); opacity:.5; }
+.play-btn {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.3);
+  transition:background .2s;
+  cursor:pointer;
+}
+.play-btn:hover { background:rgba(0,0,0,.5); }
+.play-btn i { font-size:2rem; color:#fff; }
+.testi-stars { color:#FF9500; font-size:.85rem; margin-bottom:8px; }
+.testi-text { font-size:.88rem; color:var(--text2); line-height:1.7; margin-bottom:14px; font-style:italic; }
+.testi-author { display:flex; align-items:center; gap:10px; }
+.testi-av {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--bg3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; font-weight:800; color:var(--accent);
+  border:2px solid var(--sep);
+  flex-shrink:0;
+}
+.testi-name { font-size:.875rem; font-weight:700; }
+.testi-loc { font-size:.72rem; color:var(--muted); }
 
-  /* DIVIDER */
-  .divider { height: 1px; background: rgba(255,255,255,0.06); }
+/* ── PROS SECTION ── */
+.pros-section { background:var(--bg2); }
+.pros-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px; margin-top:36px;
+}
+.pro-card {
+  background:var(--bg-card);
+  border:1px solid var(--sep);
+  border-radius:var(--r-lg);
+  padding:22px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.pro-av {
+  width:68px; height:68px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem; color:#fff; font-weight:800;
+  margin:0 auto 12px;
+}
+.pro-name { font-size:.95rem; font-weight:700; margin-bottom:3px; }
+.pro-spec { font-size:.78rem; color:var(--muted); margin-bottom:10px; }
+.pro-stars { color:#FF9500; font-size:.78rem; margin-bottom:12px; }
+.pro-wa {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#25D366; color:#fff;
+  font-size:.8rem; font-weight:700;
+  padding:8px 16px; border-radius:100px;
+  text-decoration:none;
+  transition:all .2s;
+}
+.pro-wa:hover { background:#1ebe5d; transform:scale(1.05); }
+
+/* ── CTA SECTION ── */
+.cta-section {
+  background:var(--accent);
+  text-align:center;
+  padding:80px 20px;
+  position:relative;
+  overflow:hidden;
+}
+.cta-section::before {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(255,255,255,.1),transparent);
+}
+.cta-section h2 {
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  color:#fff; letter-spacing:-.03em;
+  margin-bottom:12px; position:relative;
+}
+.cta-section p { color:rgba(255,255,255,.8); font-size:1rem; margin-bottom:28px; position:relative; }
+.cta-wa {
+  display:inline-flex; align-items:center; gap:10px;
+  background:#fff; color:var(--accent);
+  font-size:1.05rem; font-weight:700;
+  padding:14px 28px; border-radius:100px;
+  text-decoration:none;
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+  transition:all .25s var(--ease);
+  position:relative;
+}
+.cta-wa:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 12px 40px rgba(0,0,0,.3); }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--bg2);
+  border-top:1px solid var(--sep);
+  padding:32px 20px;
+}
+.footer-inner {
+  max-width:1100px; margin:0 auto;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+}
+.footer-logo { font-family:'DM Serif Display',serif; font-size:1.15rem; }
+.footer-logo span { color:var(--accent); }
+.footer-links { display:flex; gap:20px; }
+.footer-links a { font-size:.8rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+.footer-links a:hover { color:var(--accent); }
+.footer-copy { font-size:.78rem; color:var(--muted); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  .hero { grid-template-columns:1fr; padding-top:80px; gap:28px; }
+  .hero-stats { gap:20px; }
+  .btn-primary, .btn-ghost { width:100%; justify-content:center; }
+  .hero-actions { flex-direction:column; }
+  .banner-wrap { order:-1; }
+}
+@media(max-width:480px) {
+  section { padding:48px 16px; }
+  nav { padding:0 16px; }
+}
+
+/* ── LANG TOGGLE ── */
+[data-en] { display:none; }
+html.en [data-es] { display:none; }
+html.en [data-en] { display:revert; }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">Quick<span>Fix</span> <span class="dot"></span></a>
-  <ul class="nav-links">
-    <li><a href="#servicios">Servicios</a></li>
-    <li><a href="#como-funciona">Cómo funciona</a></li>
-    <li><a href="#expertos">Para expertos</a></li>
-    <li><a href="#resenas">Reseñas</a></li>
-  </ul>
-  <button class="nav-cta">Solicitar técnico</button>
-  <button class="nav-mobile-toggle">☰</button>
+  <a class="nav-logo" href="#">Quick<span>Fix</span></a>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lt on" id="lt-es" onclick="setLang('es')">ES</button>
+      <button class="lt" id="lt-en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="icon-btn" onclick="toggleDark()" id="theme-btn" title="Cambiar tema">
+      <i class="fa-regular fa-moon" id="theme-icon"></i>
+    </button>
+    <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20un%20servicio%20de%20QuickFix" target="_blank" class="nav-btn">
+      <span data-es>Cotizar</span><span data-en>Get a quote</span>
+    </a>
+  </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="live-dot"></span>
-      +240 técnicos disponibles ahora
-    </div>
-    <h1>Tu técnico<br/><em>llega en</em><br/><span class="hl">60 minutos.</span></h1>
-    <p>Plomería, electricidad, cerrajería y limpieza a domicilio. Técnicos verificados, precios claros, pago seguro desde tu celular.</p>
-    <div class="hero-actions">
-      <a href="#servicios" class="btn-primary">🔧 Solicitar servicio</a>
-      <a href="#expertos" class="btn-secondary">Soy técnico →</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">12K+</div>
-        <div class="stat-label">Servicios completados</div>
+<section style="padding:0">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span data-es>Bogotá y zonas aledañas</span>
+        <span data-en>Bogotá and surrounding areas</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">4.9★</div>
-        <div class="stat-label">Calificación promedio</div>
+      <h1 data-es>Tu espacio,<br/><em>impecable.</em></h1>
+      <h1 data-en>Your space,<br/><em>immaculate.</em></h1>
+      <p class="hero-sub">
+        <span data-es>Pisos pulidos y brillados, pintura profesional y obra en casas y apartamentos. Operarios verificados, resultados garantizados.</span>
+        <span data-en>Polished and buffed floors, professional painting and construction work in homes and apartments. Verified workers, guaranteed results.</span>
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20un%20servicio%20de%20QuickFix" target="_blank" class="btn-primary">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span data-es>Cotizar por WhatsApp</span>
+          <span data-en>Quote via WhatsApp</span>
+        </a>
+        <a href="#servicios" class="btn-ghost">
+          <span data-es>Ver servicios</span>
+          <span data-en>Our services</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:.75rem"></i>
+        </a>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">240+</div>
-        <div class="stat-label">Técnicos activos</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PHONE MOCKUP -->
-  <div class="hero-visual">
-    <div class="phone-frame">
-      <div class="phone-notch"></div>
-      <div class="phone-screen">
-        <div class="ph-header">
-          <div class="ph-header-top">
-            <span class="ph-title">QuickFix 🔧</span>
-            <div class="ph-avatar">CA</div>
-          </div>
-          <div class="ph-search">🔍 &nbsp;¿Qué necesitas arreglar?</div>
-        </div>
-        <div class="ph-cats">
-          <div class="ph-cat active">Todos</div>
-          <div class="ph-cat">Plomería</div>
-          <div class="ph-cat">Eléctrico</div>
-          <div class="ph-cat">Limpieza</div>
-        </div>
-        <div class="ph-cards">
-          <div class="ph-card">
-            <div class="ph-card-icon" style="background:rgba(27,94,247,0.2)">🔧</div>
-            <div class="ph-card-info">
-              <div class="ph-card-name">Carlos M. — Plomero</div>
-              <div class="ph-card-meta">A 1.2km · <span class="ph-stars">★★★★★</span></div>
-            </div>
-            <div class="ph-card-price">$45k</div>
-          </div>
-          <div class="ph-card">
-            <div class="ph-card-icon" style="background:rgba(255,107,43,0.2)">⚡</div>
-            <div class="ph-card-info">
-              <div class="ph-card-name">Ana R. — Electricista</div>
-              <div class="ph-card-meta">A 0.8km · <span class="ph-stars">★★★★★</span></div>
-            </div>
-            <div class="ph-card-price">$55k</div>
-          </div>
-          <div class="ph-card">
-            <div class="ph-card-icon" style="background:rgba(74,222,128,0.2)">🔑</div>
-            <div class="ph-card-info">
-              <div class="ph-card-name">Luis T. — Cerrajero</div>
-              <div class="ph-card-meta">A 2.1km · <span class="ph-stars">★★★★☆</span></div>
-            </div>
-            <div class="ph-card-price">$38k</div>
-          </div>
-        </div>
-        <div class="ph-cta">Solicitar ahora →</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES -->
-<section class="section" id="servicios">
-  <span class="section-tag">Servicios</span>
-  <h2 class="section-title">Todo lo que tu hogar<br/>puede necesitar</h2>
-  <p class="section-sub">Técnicos verificados con experiencia comprobada, listos para atenderte hoy mismo.</p>
-  <div class="services-grid">
-    <div class="service-card">
-      <span class="service-icon">🚿</span>
-      <h3>Plomería</h3>
-      <p>Fugas, tuberías, instalación de sanitarios, destapes y reparaciones urgentes.</p>
-      <span class="s-price">Desde $35.000 COP</span>
-      <span class="service-tag">Urgencias 24h</span>
-    </div>
-    <div class="service-card">
-      <span class="service-icon">⚡</span>
-      <h3>Electricidad</h3>
-      <p>Instalaciones, cortos, cambio de breakers, tomas e iluminación.</p>
-      <span class="s-price">Desde $45.000 COP</span>
-    </div>
-    <div class="service-card">
-      <span class="service-icon">🔑</span>
-      <h3>Cerrajería</h3>
-      <p>Apertura de puertas, cambio de cerraduras, duplicado de llaves.</p>
-      <span class="s-price">Desde $30.000 COP</span>
-      <span class="service-tag">En 30 min</span>
-    </div>
-    <div class="service-card">
-      <span class="service-icon">🧹</span>
-      <h3>Limpieza profunda</h3>
-      <p>Apartamentos, casas, oficinas. Productos incluidos, personal verificado.</p>
-      <span class="s-price">Desde $80.000 COP</span>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- HOW IT WORKS -->
-<section class="how-section" id="como-funciona">
-  <div style="text-align:center">
-    <span class="section-tag">¿Cómo funciona?</span>
-    <h2 class="section-title">3 pasos, sin complicaciones</h2>
-    <p class="section-sub" style="margin:0 auto">Desde tu celular en menos de 2 minutos.</p>
-  </div>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Elige el servicio</h3>
-      <p>Selecciona qué necesitas y dinos la dirección. Sin registros complicados.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Te conectamos al instante</h3>
-      <p>Nuestro sistema busca el técnico más cercano y disponible en segundos.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>Paga seguro al finalizar</h3>
-      <p>Solo pagas cuando el trabajo está hecho. Tarjeta, PSE o efectivo.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <h3>Califica tu experiencia</h3>
-      <p>Tu opinión ayuda a mantener la calidad de todos los técnicos.</p>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- EXPERTS / AFILIACION -->
-<section class="experts-section" id="expertos">
-  <div class="experts-inner">
-    <div>
-      <span class="section-tag">Para técnicos y profesionales</span>
-      <h2 class="section-title">Haz crecer tu negocio<br/>con QuickFix Pro</h2>
-      <p class="section-sub" style="margin-bottom:2rem">Recibe clientes constantemente sin hacer publicidad. Tú pones el talento, nosotros ponemos la tecnología y los usuarios.</p>
-      <a href="#" class="btn-primary">Registrarme como técnico →</a>
-      <p style="font-size:0.8rem;color:rgba(255,255,255,0.35);margin-top:1rem">✓ Sin costo de inscripción · ✓ Primeros 30 días gratis</p>
-    </div>
-    <div class="experts-plans">
-      <div class="plan-card">
-        <div class="plan-top">
-          <div class="plan-name-w">
-            <h3>Starter</h3>
-            <p>Para empezar</p>
-          </div>
-          <div class="plan-price-w">
-            <div class="price">$19<span style="font-size:0.9rem;font-weight:400">USD</span></div>
-            <div class="mo">/mes</div>
-          </div>
-        </div>
-        <div class="plan-features">
-          <span class="plan-feat">10 leads/mes</span>
-          <span class="plan-feat">Perfil verificado</span>
-          <span class="plan-feat">Comisión 18%</span>
-        </div>
-      </div>
-      <div class="plan-card featured">
-        <div class="plan-top">
-          <div class="plan-name-w">
-            <h3>Pro</h3>
-            <p>El más popular</p>
-          </div>
-          <div class="plan-price-w">
-            <div class="plan-top" style="justify-content:flex-end;margin-bottom:0"><span class="pop-badge">Popular</span></div>
-            <div class="price">$49<span style="font-size:0.9rem;font-weight:400">USD</span></div>
-            <div class="mo">/mes</div>
-          </div>
-        </div>
-        <div class="plan-features">
-          <span class="plan-feat">Leads ilimitados</span>
-          <span class="plan-feat">Top en búsquedas</span>
-          <span class="plan-feat">Comisión 12%</span>
-          <span class="plan-feat">Estadísticas</span>
-        </div>
-      </div>
-      <div class="plan-card">
-        <div class="plan-top">
-          <div class="plan-name-w">
-            <h3>Business</h3>
-            <p>Para equipos</p>
-          </div>
-          <div class="plan-price-w">
-            <div class="price">$99<span style="font-size:0.9rem;font-weight:400">USD</span></div>
-            <div class="mo">/mes</div>
-          </div>
-        </div>
-        <div class="plan-features">
-          <span class="plan-feat">Multi-técnico</span>
-          <span class="plan-feat">Posición #1</span>
-          <span class="plan-feat">Comisión 8%</span>
-          <span class="plan-feat">Dashboard PRO</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- REVIEWS -->
-<section class="reviews-section" id="resenas">
-  <span class="section-tag">Reseñas</span>
-  <h2 class="section-title">Lo que dicen nuestros usuarios</h2>
-  <div class="reviews-grid">
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">"El plomero llegó en 45 minutos. Resolvió la fuga que tenía hace semanas y el precio fue justo. 100% recomendado."</p>
-      <div class="review-author">
-        <div class="review-avatar" style="background:rgba(27,94,247,0.25);color:#7BA8FF">ML</div>
+      <div class="hero-stats">
         <div>
-          <div class="review-name">María López</div>
-          <div class="review-role">Bogotá · Plomería</div>
+          <div class="stat-n">500+</div>
+          <div class="stat-l"><span data-es>Trabajos completados</span><span data-en>Jobs completed</span></div>
+        </div>
+        <div>
+          <div class="stat-n">4.9</div>
+          <div class="stat-l"><span data-es>Calificación promedio</span><span data-en>Average rating</span></div>
+        </div>
+        <div>
+          <div class="stat-n">100%</div>
+          <div class="stat-l"><span data-es>Satisfacción</span><span data-en>Satisfaction</span></div>
         </div>
       </div>
     </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Se me olvidaron las llaves. En 30 minutos llegó el cerrajero. Excelente servicio y muy amable. La app es muy fácil de usar."</p>
-      <div class="review-author">
-        <div class="review-avatar" style="background:rgba(255,107,43,0.2);color:#FF9A6B">JR</div>
-        <div>
-          <div class="review-name">Julián Ruiz</div>
-          <div class="review-role">Medellín · Cerrajería</div>
+
+    <!-- BANNER ROTATIVO -->
+    <div class="banner-wrap" id="banner">
+      <div class="banner-slide active">
+        <div class="banner-placeholder">
+          <i class="fa-light fa-layer-group"></i>
+          <span data-es>Pulido de pisos — Foto 1</span>
+          <span data-en>Floor polishing — Photo 1</span>
         </div>
+      </div>
+      <div class="banner-slide">
+        <div class="banner-placeholder">
+          <i class="fa-light fa-paintbrush-fine"></i>
+          <span data-es>Pintura interior — Foto 2</span>
+          <span data-en>Interior painting — Photo 2</span>
+        </div>
+      </div>
+      <div class="banner-slide">
+        <div class="banner-placeholder">
+          <i class="fa-light fa-sparkles"></i>
+          <span data-es>Brillado de mármol — Foto 3</span>
+          <span data-en>Marble polishing — Photo 3</span>
+        </div>
+      </div>
+      <div class="banner-slide">
+        <div class="banner-placeholder">
+          <i class="fa-light fa-hammer"></i>
+          <span data-es>Remodelación — Foto 4</span>
+          <span data-en>Remodeling — Photo 4</span>
+        </div>
+      </div>
+      <div class="banner-slide">
+        <div class="banner-placeholder">
+          <i class="fa-light fa-house-crack"></i>
+          <span data-es>Obra y acabados — Foto 5</span>
+          <span data-en>Construction & finishes — Photo 5</span>
+        </div>
+      </div>
+      <div class="banner-dots" id="banner-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="section-inner">
+    <span class="section-tag"><span data-es>Servicios</span><span data-en>Services</span></span>
+    <h2 class="section-title">
+      <span data-es>Lo que hacemos,<br/>lo hacemos bien</span>
+      <span data-en>What we do,<br/>we do right</span>
+    </h2>
+    <p class="section-sub">
+      <span data-es>Especializados en pisos, pintura y obra. Cada trabajo con materiales de calidad y operarios con experiencia.</span>
+      <span data-en>Specialized in floors, painting and construction. Every job with quality materials and experienced workers.</span>
+    </p>
+    <div class="services-grid">
+
+      <div class="service-card">
+        <div class="svc-icon"><i class="fa-light fa-layer-group"></i></div>
+        <div class="svc-title"><span data-es>Pisos</span><span data-en>Floors</span></div>
+        <div class="svc-desc">
+          <span data-es>Pulido, brillado, encerado y cristalizado de todo tipo de pisos. Mármol, cerámica, madera y más.</span>
+          <span data-en>Polishing, buffing, waxing and crystallizing all floor types. Marble, ceramic, wood and more.</span>
+        </div>
+        <div class="svc-items">
+          <span class="svc-tag"><span data-es>Pulido</span><span data-en>Polishing</span></span>
+          <span class="svc-tag"><span data-es>Brillado</span><span data-en>Buffing</span></span>
+          <span class="svc-tag"><span data-es>Encerado</span><span data-en>Waxing</span></span>
+          <span class="svc-tag"><span data-es>Cristalizado</span><span data-en>Crystallizing</span></span>
+        </div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20servicio%20de%20pisos" target="_blank" class="svc-cta">
+          <span data-es>Cotizar</span><span data-en>Get a quote</span>
+          <i class="fa-solid fa-arrow-right" style="font-size:.75rem"></i>
+        </a>
+      </div>
+
+      <div class="service-card">
+        <div class="svc-icon"><i class="fa-light fa-paintbrush-fine"></i></div>
+        <div class="svc-title"><span data-es>Pintura</span><span data-en>Painting</span></div>
+        <div class="svc-desc">
+          <span data-es>Pintura interior y exterior para casas y apartamentos. Estuco, resina, pintura especial y acabados decorativos.</span>
+          <span data-en>Interior and exterior painting for houses and apartments. Stucco, resin, special paint and decorative finishes.</span>
+        </div>
+        <div class="svc-items">
+          <span class="svc-tag"><span data-es>Interior</span><span data-en>Interior</span></span>
+          <span class="svc-tag"><span data-es>Exterior</span><span data-en>Exterior</span></span>
+          <span class="svc-tag"><span data-es>Estuco</span><span data-en>Stucco</span></span>
+          <span class="svc-tag"><span data-es>Decorativo</span><span data-en>Decorative</span></span>
+        </div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20servicio%20de%20pintura" target="_blank" class="svc-cta">
+          <span data-es>Cotizar</span><span data-en>Get a quote</span>
+          <i class="fa-solid fa-arrow-right" style="font-size:.75rem"></i>
+        </a>
+      </div>
+
+      <div class="service-card">
+        <div class="svc-icon"><i class="fa-light fa-hammer"></i></div>
+        <div class="svc-title"><span data-es>Obra</span><span data-en>Construction</span></div>
+        <div class="svc-desc">
+          <span data-es>Remodelaciones, acabados, drywall, enchape, instalaciones y todo tipo de obra menor en tu propiedad.</span>
+          <span data-en>Remodeling, finishes, drywall, tiling, installations and all types of minor construction work on your property.</span>
+        </div>
+        <div class="svc-items">
+          <span class="svc-tag"><span data-es>Remodelación</span><span data-en>Remodeling</span></span>
+          <span class="svc-tag">Drywall</span>
+          <span class="svc-tag"><span data-es>Enchape</span><span data-en>Tiling</span></span>
+          <span class="svc-tag"><span data-es>Acabados</span><span data-en>Finishes</span></span>
+        </div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20servicio%20de%20obra" target="_blank" class="svc-cta">
+          <span data-es>Cotizar</span><span data-en>Get a quote</span>
+          <i class="fa-solid fa-arrow-right" style="font-size:.75rem"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="how-section">
+  <div class="section-inner">
+    <span class="section-tag"><span data-es>Proceso</span><span data-en>Process</span></span>
+    <h2 class="section-title">
+      <span data-es>Simple y sin complicaciones</span>
+      <span data-en>Simple and hassle-free</span>
+    </h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-title"><span data-es>Escríbenos</span><span data-en>Contact us</span></div>
+        <div class="step-desc"><span data-es>Cuéntanos qué necesitas por WhatsApp — tipo de trabajo, espacio y ubicación en Bogotá.</span><span data-en>Tell us what you need via WhatsApp — type of work, space and location in Bogotá.</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-title"><span data-es>Recibe tu cotización</span><span data-en>Get your quote</span></div>
+        <div class="step-desc"><span data-es>Te conectamos con el profesional ideal y recibes una cotización personalizada en minutos.</span><span data-en>We connect you with the ideal professional and you get a personalized quote in minutes.</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-title"><span data-es>Agendamos</span><span data-en>We schedule</span></div>
+        <div class="step-desc"><span data-es>Acordamos fecha y hora según tu disponibilidad. Puntualidad garantizada.</span><span data-en>We agree on date and time according to your availability. Punctuality guaranteed.</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-title"><span data-es>Trabajo impecable</span><span data-en>Impeccable work</span></div>
+        <div class="step-desc"><span data-es>Nuestros operarios llegan, trabajan y entregan resultados que hablan por sí solos.</span><span data-en>Our workers arrive, work and deliver results that speak for themselves.</span></div>
       </div>
     </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">"Como técnico llevo 3 meses en QuickFix Pro y ya tengo agenda llena. Antes buscaba clientes, ahora me llegan solos."</p>
-      <div class="review-author">
-        <div class="review-avatar" style="background:rgba(74,222,128,0.2);color:#4ADE80">CP</div>
-        <div>
-          <div class="review-name">Carlos Pedraza</div>
-          <div class="review-role">Técnico verificado · Pro</div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section id="testimonios">
+  <div class="section-inner">
+    <span class="section-tag"><span data-es>Clientes satisfechos</span><span data-en>Happy clients</span></span>
+    <h2 class="section-title">
+      <span data-es>Resultados que<br/>hablan por sí solos</span>
+      <span data-en>Results that<br/>speak for themselves</span>
+    </h2>
+    <p class="section-sub">
+      <span data-es>Fotos y videos de trabajos reales en Bogotá.</span>
+      <span data-en>Photos and videos of real jobs in Bogotá.</span>
+    </p>
+    <div class="testi-grid">
+
+      <div class="testi-card">
+        <div class="testi-media">
+          <i class="fa-light fa-image"></i>
+          <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          <span data-es>"El piso de mármol quedó como nuevo. El trabajo fue profesional, limpio y en el tiempo acordado."</span>
+          <span data-en>"The marble floor looks brand new. The work was professional, clean and on time."</span>
+        </p>
+        <div class="testi-author">
+          <div class="testi-av">ML</div>
+          <div>
+            <div class="testi-name">María L.</div>
+            <div class="testi-loc"><span data-es>Chapinero · Pulido de pisos</span><span data-en>Chapinero · Floor polishing</span></div>
+          </div>
         </div>
       </div>
+
+      <div class="testi-card">
+        <div class="testi-media">
+          <i class="fa-light fa-image"></i>
+          <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          <span data-es>"Pintaron todo el apartamento en dos días. Excelente acabado, muy ordenados y el precio justo."</span>
+          <span data-en>"They painted the entire apartment in two days. Excellent finish, very tidy and fair price."</span>
+        </p>
+        <div class="testi-author">
+          <div class="testi-av">JR</div>
+          <div>
+            <div class="testi-name">Julián R.</div>
+            <div class="testi-loc"><span data-es>Usaquén · Pintura interior</span><span data-en>Usaquén · Interior painting</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-media">
+          <i class="fa-light fa-image"></i>
+          <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">
+          <span data-es>"La remodelación del baño superó mis expectativas. Detalle, calidad y cumplimiento."</span>
+          <span data-en>"The bathroom remodel exceeded my expectations. Detail, quality and reliability."</span>
+        </p>
+        <div class="testi-author">
+          <div class="testi-av">AP</div>
+          <div>
+            <div class="testi-name">Andrea P.</div>
+            <div class="testi-loc"><span data-es>Suba · Remodelación</span><span data-en>Suba · Remodeling</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROFESIONALES -->
+<section class="pros-section">
+  <div class="section-inner">
+    <span class="section-tag"><span data-es>Nuestros profesionales</span><span data-en>Our professionals</span></span>
+    <h2 class="section-title">
+      <span data-es>Operarios verificados<br/>y con experiencia</span>
+      <span data-en>Verified workers<br/>with experience</span>
+    </h2>
+    <div class="pros-grid">
+
+      <div class="pro-card">
+        <div class="pro-av">CP</div>
+        <div class="pro-name">Carlos P.</div>
+        <div class="pro-spec"><span data-es>Especialista en pisos · 10 años</span><span data-en>Floor specialist · 10 yrs</span></div>
+        <div class="pro-stars">★★★★★ 4.9</div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20con%20Carlos%20para%20pisos" target="_blank" class="pro-wa">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span data-es>Cotizar</span><span data-en>Quote</span>
+        </a>
+      </div>
+
+      <div class="pro-card">
+        <div class="pro-av">MR</div>
+        <div class="pro-name">Miguel R.</div>
+        <div class="pro-spec"><span data-es>Pintor profesional · 8 años</span><span data-en>Professional painter · 8 yrs</span></div>
+        <div class="pro-stars">★★★★★ 4.8</div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20con%20Miguel%20para%20pintura" target="_blank" class="pro-wa">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span data-es>Cotizar</span><span data-en>Quote</span>
+        </a>
+      </div>
+
+      <div class="pro-card">
+        <div class="pro-av">JM</div>
+        <div class="pro-name">Jorge M.</div>
+        <div class="pro-spec"><span data-es>Maestro de obra · 15 años</span><span data-en>Construction master · 15 yrs</span></div>
+        <div class="pro-stars">★★★★★ 5.0</div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20con%20Jorge%20para%20obra" target="_blank" class="pro-wa">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span data-es>Cotizar</span><span data-en>Quote</span>
+        </a>
+      </div>
+
+      <div class="pro-card">
+        <div class="pro-av">LP</div>
+        <div class="pro-name">Luis P.</div>
+        <div class="pro-spec"><span data-es>Brillado y cristalizado · 6 años</span><span data-en>Buffing & crystallizing · 6 yrs</span></div>
+        <div class="pro-stars">★★★★★ 4.9</div>
+        <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20con%20Luis%20para%20brillado" target="_blank" class="pro-wa">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span data-es>Cotizar</span><span data-en>Quote</span>
+        </a>
+      </div>
+
     </div>
   </div>
 </section>
 
 <!-- CTA FINAL -->
 <section class="cta-section">
-  <h2>Descarga QuickFix<br/>y empieza hoy</h2>
-  <p>Disponible para iOS y Android. También desde la web.</p>
-  <div class="cta-btns">
-    <a href="#" class="app-btn">
-      <span class="app-btn-icon">🍎</span>
-      <div class="app-btn-text">
-        <span>Descargar en</span>
-        <strong>App Store</strong>
-      </div>
-    </a>
-    <a href="#" class="app-btn">
-      <span class="app-btn-icon">🤖</span>
-      <div class="app-btn-text">
-        <span>Disponible en</span>
-        <strong>Google Play</strong>
-      </div>
-    </a>
-    <a href="#" class="app-btn">
-      <span class="app-btn-icon">🌐</span>
-      <div class="app-btn-text">
-        <span>Abrir desde</span>
-        <strong>Navegador web</strong>
-      </div>
-    </a>
-  </div>
+  <h2 data-es>¿Listo para transformar<br/>tu espacio?</h2>
+  <h2 data-en>Ready to transform<br/>your space?</h2>
+  <p data-es>Escríbenos hoy y recibe tu cotización en minutos.</p>
+  <p data-en>Write to us today and get your quote in minutes.</p>
+  <a href="https://wa.me/573143095194?text=Hola,%20quiero%20cotizar%20un%20servicio%20de%20QuickFix%20en%20Bogot%C3%A1" target="_blank" class="cta-wa">
+    <i class="fa-brands fa-whatsapp" style="font-size:1.3rem"></i>
+    <span data-es>Cotizar ahora por WhatsApp</span>
+    <span data-en>Quote now via WhatsApp</span>
+  </a>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="logo">Quick<span>Fix</span></div>
-  <p>© 2025 QuickFix. Todos los derechos reservados.</p>
-  <nav>
-    <a href="#">Términos</a>
-    <a href="#">Privacidad</a>
-    <a href="#">Contacto</a>
-  </nav>
+  <div class="footer-inner">
+    <div class="footer-logo">Quick<span>Fix</span></div>
+    <div class="footer-links">
+      <a href="#servicios"><span data-es>Servicios</span><span data-en>Services</span></a>
+      <a href="#testimonios"><span data-es>Testimonios</span><span data-en>Reviews</span></a>
+      <a href="https://wa.me/573143095194" target="_blank">WhatsApp</a>
+    </div>
+    <div class="footer-copy">© 2025 QuickFix · Bogotá</div>
+  </div>
 </footer>
 
+<!-- ── CÓMO ACTUALIZAR FOTOS ── 
+Para reemplazar las fotos del banner:
+1. Busca los divs con class="banner-placeholder"
+2. Reemplaza cada uno por: <img src="URL_DE_TU_FOTO" alt="descripción"/>
+3. Ejemplo: <img src="https://i.imgur.com/tu-foto.jpg" alt="Pulido de pisos"/>
+
+Para reemplazar fotos de testimonios:
+1. Busca los divs con class="testi-media"
+2. Agrega tu imagen o video dentro del div
+3. Para video: <video src="tu-video.mp4" controls></video>
+-->
+
+<script>
+// ── DARK MODE ──
+function toggleDark() {
+  const dark = document.documentElement.classList.toggle('dark')
+  document.getElementById('theme-icon').className = dark ? 'fa-regular fa-sun' : 'fa-regular fa-moon'
+  localStorage.setItem('theme', dark ? 'dark' : 'light')
+}
+if (localStorage.getItem('theme') === 'dark' ||
+   (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.classList.add('dark')
+  document.getElementById('theme-icon').className = 'fa-regular fa-sun'
+}
+
+// ── LANGUAGE ──
+function setLang(lang) {
+  document.documentElement.classList.toggle('en', lang === 'en')
+  document.getElementById('lt-es').classList.toggle('on', lang === 'es')
+  document.getElementById('lt-en').classList.toggle('on', lang === 'en')
+  document.documentElement.lang = lang
+}
+
+// ── BANNER ROTATIVO ──
+const slides = document.querySelectorAll('.banner-slide')
+const dotsEl = document.getElementById('banner-dots')
+let current = 0
+
+// Crear dots
+slides.forEach((_,i) => {
+  const d = document.createElement('div')
+  d.className = 'bdot' + (i===0?' active':'')
+  d.onclick = () => goSlide(i)
+  dotsEl.appendChild(d)
+})
+
+function goSlide(n) {
+  slides[current].classList.remove('active')
+  document.querySelectorAll('.bdot')[current].classList.remove('active')
+  current = n
+  slides[current].classList.add('active')
+  document.querySelectorAll('.bdot')[current].classList.add('active')
+}
+
+setInterval(() => goSlide((current+1) % slides.length), 3500)
+</script>
 </body>
 </html>
