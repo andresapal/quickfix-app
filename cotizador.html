@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cotizador — Lan Marmoles</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0B4DBA;--gold:#D9A520;--bg:#f8f8fa;--bg-dark:#0a0a0a;
+  --text:#1a1a1a;--text-light:#6b6b6b;--text-inv:#fff;
+  --border:#e0e0e0;--white:#fff;--green:#2ecc71;--red:#d44;
+  --card-shadow:0 1px 4px rgba(0,0,0,.06);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── Topbar ── */
+.topbar{
+  background:var(--bg-dark);color:var(--text-inv);
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.topbar .brand{font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.topbar .brand span{color:var(--gold)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.tb-btn{
+  background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text-inv);
+  padding:6px 12px;font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.tb-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tb-btn.active{border-color:var(--gold);background:rgba(217,165,32,.15);color:var(--gold)}
+
+/* ── Shell ── */
+.shell{max-width:900px;margin:0 auto;padding:20px 16px 100px}
+
+/* ── Cards ── */
+.card{background:var(--white);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--card-shadow)}
+.card-title{
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;
+}
+.card-title .toggle-btn{
+  font-size:11px;color:var(--text-light);cursor:pointer;font-weight:400;
+  letter-spacing:0;text-transform:none;border:none;background:none;font-family:inherit;
+}
+.card-title .toggle-btn:hover{color:var(--blue)}
+
+/* ── Form grid ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.form-grid .full{grid-column:1/-1}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+
+.field{display:flex;flex-direction:column;gap:4px}
+.field .lbl{font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text-light)}
+.field .lbl .req{color:var(--red);margin-left:2px}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--border);background:var(--white);
+  color:var(--text);font-size:14px;font-family:inherit;transition:border-color .2s;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
+.field select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b6b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.field textarea{resize:vertical;min-height:60px}
+.field input[type="number"]{-moz-appearance:textfield}
+.field input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── Client selector ── */
+.client-selector{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.client-selector select{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--border);font-size:14px;font-family:inherit;cursor:pointer;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b6b'/%3E%3C/svg%3E") no-repeat right 12px center}
+.client-selector select:focus{outline:none;border-color:var(--blue)}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:10px 20px;
+  font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  border:1px solid var(--blue);background:var(--blue);color:var(--white);
+  cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.btn:hover{opacity:.85}
+.btn-outline{background:transparent;color:var(--blue)}
+.btn-outline:hover{background:var(--blue);color:var(--white);opacity:1}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:var(--bg-dark)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-danger{background:transparent;border-color:var(--red);color:var(--red)}
+.btn-danger:hover{background:var(--red);color:var(--white);opacity:1}
+.btn-wa{background:#25D366;border-color:#25D366;color:var(--white)}
+.btn-wa:hover{background:#1da851;border-color:#1da851;opacity:1}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+/* ── Proposals ── */
+.proposal{
+  border:1px solid var(--border);padding:16px;margin-bottom:12px;
+  background:var(--white);position:relative;
+}
+.proposal-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+}
+.proposal-num{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--blue);
+}
+.proposal-remove{
+  background:none;border:none;color:var(--text-light);cursor:pointer;
+  font-size:18px;line-height:1;padding:0 4px;
+}
+.proposal-remove:hover{color:var(--red)}
+.proposal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+@media(max-width:600px){.proposal-grid{grid-template-columns:1fr}}
+.proposal-subtotal{
+  text-align:right;font-size:18px;font-weight:700;color:var(--blue);
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
+}
+.cost-field{display:none}
+.show-costs .cost-field{display:flex}
+
+/* ── Summary ── */
+.summary-line{
+  display:flex;justify-content:space-between;padding:10px 0;
+  border-bottom:1px solid var(--border);font-size:14px;
+}
+.summary-line:last-child{border:none}
+.summary-line .label{color:var(--text-light)}
+.summary-total{
+  display:flex;justify-content:space-between;padding:14px 0;
+  font-size:22px;font-weight:700;border-top:2px solid var(--text);margin-top:8px;
+}
+
+/* ── History ── */
+.history-panel{display:none}
+.history-panel.open{display:block}
+.history-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border:1px solid var(--border);margin-bottom:6px;
+  background:var(--white);cursor:pointer;transition:border-color .2s;
+}
+.history-item:hover{border-color:var(--blue)}
+.history-item .hi-main{flex:1}
+.history-item .hi-ref{font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.5px}
+.history-item .hi-client{font-size:13px;color:var(--text)}
+.history-item .hi-date{font-size:11px;color:var(--text-light)}
+.history-item .hi-total{font-size:15px;font-weight:700;text-align:right}
+.history-item .hi-actions{display:flex;gap:6px;margin-left:12px}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--bg-dark);color:var(--text-inv);padding:12px 24px;
+  font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px}
+
+/* ── Powered ── */
+.powered{text-align:center;padding:24px;font-size:11px;color:var(--text-light);letter-spacing:1px;text-transform:uppercase}
+.powered a{color:var(--blue);text-decoration:none}
+
+/* ── Print ── */
+@media print{
+  .topbar,.tb-btn,.btn-row,.proposal-remove,.client-selector,
+  .card-title .toggle-btn,.history-panel,.powered,.toast,
+  .cost-field,#addProposalBtn{display:none!important}
+  body{background:#fff}
+  .shell{padding:0;max-width:100%}
+  .card{border:none;box-shadow:none;padding:10px 0}
+  .proposal{border:1px solid #ddd;page-break-inside:avoid}
+  .print-header{display:block!important}
+}
+.print-header{display:none;text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--text)}
+.print-header h1{font-size:20px;letter-spacing:2px;text-transform:uppercase}
+.print-header p{font-size:12px;color:var(--text-light);margin-top:4px}
+
+@media(max-width:480px){
+  .topbar{padding:10px 14px}
+  .shell{padding:12px 10px 80px}
+  .card{padding:14px}
+  .btn-row{flex-direction:column}
+  .btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">Lan <span>Marmoles</span></div>
+  <div class="topbar-right">
+    <button class="tb-btn" id="btnCosts" onclick="toggleCosts()">Costos</button>
+    <button class="tb-btn" id="btnHistory" onclick="toggleHistory()">Historial</button>
+  </div>
+</div>
+
+<!-- Print header -->
+<div class="print-header">
+  <h1>Lan Marmoles — Cotizacion</h1>
+  <p>lanmarmoles.online &middot; +57 310 2696050</p>
+</div>
+
+<div class="shell">
+
+  <!-- CLIENT -->
+  <div class="card" id="clientCard">
+    <div class="card-title">
+      Datos del cliente
+      <button class="toggle-btn" onclick="toggleClientForm()">Ocultar</button>
+    </div>
+    <div class="client-selector">
+      <select id="clientSelect" onchange="loadClient()">
+        <option value="">-- Nuevo cliente --</option>
+      </select>
+      <button class="btn btn-sm btn-outline" onclick="clearClient()">Limpiar</button>
+    </div>
+    <div id="clientForm" class="form-grid">
+      <div class="field">
+        <span class="lbl">Nombre completo<span class="req">*</span></span>
+        <input type="text" id="cName" style="text-transform:capitalize">
+      </div>
+      <div class="field">
+        <span class="lbl">Telefono<span class="req">*</span></span>
+        <input type="tel" id="cPhone">
+      </div>
+      <div class="field">
+        <span class="lbl">Correo</span>
+        <input type="email" id="cEmail">
+      </div>
+      <div class="field">
+        <span class="lbl">Direccion</span>
+        <input type="text" id="cAddress">
+      </div>
+      <div class="field">
+        <span class="lbl">NIT / Cedula</span>
+        <input type="text" id="cNit">
+      </div>
+      <div class="field">
+        <span class="lbl">Empresa</span>
+        <input type="text" id="cCompany">
+      </div>
+      <div class="field full">
+        <span class="lbl">Rol en esta cotizacion</span>
+        <select id="cRole">
+          <option value="propietario">Propietario</option>
+          <option value="administrador">Administrador</option>
+          <option value="contratista">Contratista</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSALS -->
+  <div class="card" id="proposalsCard">
+    <div class="card-title">
+      Propuestas
+      <span style="font-weight:400;font-size:11px;color:var(--text-light);letter-spacing:0;text-transform:none" id="quoteRef"></span>
+    </div>
+    <div id="proposalsList"></div>
+    <button class="btn btn-outline btn-sm" id="addProposalBtn" onclick="addProposal()" style="margin-top:8px">+ Agregar propuesta</button>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    <div class="card-title">Observaciones</div>
+    <div class="field">
+      <textarea id="quoteNotes" placeholder="Condiciones especiales, pisos superiores, acceso, etc."></textarea>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card" id="summaryCard">
+    <div class="card-title">
+      Resumen
+      <label style="font-weight:400;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0;text-transform:none;color:var(--text)">
+        <input type="checkbox" id="showGrandTotal" checked onchange="renderSummary()"> Total general
+      </label>
+    </div>
+    <div id="summaryLines"></div>
+    <div id="grandTotal" class="summary-total" style="display:none">
+      <span>Total</span><span id="grandTotalVal">$0</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveQuote()">Guardar</button>
+      <button class="btn btn-wa" onclick="sendWhatsApp()">WhatsApp</button>
+      <button class="btn btn-outline" onclick="window.print()">Imprimir / PDF</button>
+      <button class="btn btn-outline" onclick="newQuote()">Nueva cotizacion</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card history-panel" id="historyPanel">
+    <div class="card-title">Historial de cotizaciones</div>
+    <div id="historyList"></div>
+  </div>
+
+</div>
+
+<div class="powered">
+  Impulsado por <a href="https://7group.site" target="_blank">7group</a>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ═══════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════ */
+var CATEGORIES = [
+  {id:'pisos', name:'Pisos',
+   icon:'F', services:[
+    {id:'pulido_marmol',      name:'Pulido de marmol'},
+    {id:'pulido_granito',     name:'Pulido de granito'},
+    {id:'pulido_porcelanato', name:'Pulido de porcelanato'},
+    {id:'cristalizado',       name:'Cristalizado'},
+    {id:'instalacion_piso',   name:'Instalacion de piso'},
+    {id:'impermeabilizacion', name:'Impermeabilizacion'}
+  ]},
+  {id:'mesones', name:'Mesones y Superficies',
+   icon:'M', services:[
+    {id:'arreglo_mesones',     name:'Arreglo de mesones'},
+    {id:'pulido_mesones',      name:'Pulido de mesones'},
+    {id:'instalacion_mesones', name:'Instalacion de mesones'}
+  ]},
+  {id:'paredes', name:'Paredes y Fachadas',
+   icon:'P', services:[
+    {id:'arreglo_paredes', name:'Arreglo de paredes en marmol'},
+    {id:'enchape_marmol',  name:'Enchape en marmol / granito'},
+    {id:'pintura_paredes', name:'Pintura de paredes'}
+  ]},
+  {id:'arquitectonico', name:'Elementos Arquitectonicos',
+   icon:'A', services:[
+    {id:'arcos_ascensor',         name:'Arreglo arcos de ascensor'},
+    {id:'restauracion_escaleras', name:'Restauracion de escaleras'},
+    {id:'restauracion_chimeneas', name:'Restauracion de chimeneas'}
+  ]},
+  {id:'mantenimiento', name:'Mantenimiento y Acabados',
+   icon:'T', services:[
+    {id:'sellado_proteccion', name:'Sellado y proteccion'},
+    {id:'limpieza_profunda',  name:'Limpieza profunda piedra natural'},
+    {id:'obra_blanca',        name:'Obra blanca'}
+  ]}
+];
+
+var NOTIFY = {
+  TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
+  TG_CHAT:'1081707115',
+  WA_PHONE:'573102696050'
+};
+
+var KEYS = {
+  clients:'lm_clients',
+  quotes:'lm_quotes',
+  customSvcs:'lm_custom_svcs'
+};
+
+/* ═══════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════ */
+function load(key){ try{return JSON.parse(localStorage.getItem(key))||[];}catch(e){return [];} }
+function save(key,data){ try{localStorage.setItem(key,JSON.stringify(data));}catch(e){} }
+
+function getClients(){ return load(KEYS.clients); }
+function saveClients(arr){ save(KEYS.clients,arr); }
+
+function getQuotes(){ return load(KEYS.quotes); }
+function saveQuotes(arr){ save(KEYS.quotes,arr); }
+
+function getCustomSvcs(){ return load(KEYS.customSvcs); }
+function saveCustomSvcs(arr){ save(KEYS.customSvcs,arr); }
+
+function genId(){ return Date.now().toString(36).toUpperCase()+Math.random().toString(36).substr(2,4).toUpperCase(); }
+function genRef(){ return 'LM-'+Date.now().toString(36).toUpperCase(); }
+
+/* ═══════════════════════════════════════════
+   SERVICES (predefined + custom)
+   ═══════════════════════════════════════════ */
+function getAllServices(catId){
+  var cat = CATEGORIES.find(function(c){return c.id===catId;});
+  var base = cat ? cat.services.slice() : [];
+  var custom = getCustomSvcs().filter(function(s){return s.catId===catId;});
+  custom.forEach(function(cs){
+    if(!base.find(function(b){return b.id===cs.id;})){
+      base.push({id:cs.id, name:cs.name, custom:true});
+    }
+  });
+  return base;
+}
+
+function addCustomService(catId, name){
+  var id = 'custom_'+genId().toLowerCase();
+  var arr = getCustomSvcs();
+  arr.push({id:id, name:name, catId:catId});
+  saveCustomSvcs(arr);
+  return id;
+}
+
+/* ═══════════════════════════════════════════
+   CLIENT UI
+   ═══════════════════════════════════════════ */
+var clientFormVisible = true;
+
+function renderClientSelect(){
+  var sel = document.getElementById('clientSelect');
+  var val = sel.value;
+  sel.innerHTML = '<option value="">-- Nuevo cliente --</option>';
+  getClients().forEach(function(c){
+    var opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name + (c.company?' — '+c.company:'');
+    sel.appendChild(opt);
+  });
+  if(val) sel.value = val;
+}
+
+window.loadClient = function(){
+  var id = document.getElementById('clientSelect').value;
+  if(!id){ clearClient(); return; }
+  var c = getClients().find(function(x){return x.id===id;});
+  if(!c) return;
+  document.getElementById('cName').value = c.name||'';
+  document.getElementById('cPhone').value = c.phone||'';
+  document.getElementById('cEmail').value = c.email||'';
+  document.getElementById('cAddress').value = c.address||'';
+  document.getElementById('cNit').value = c.nit||'';
+  document.getElementById('cCompany').value = c.company||'';
+};
+
+window.clearClient = function(){
+  document.getElementById('clientSelect').value = '';
+  ['cName','cPhone','cEmail','cAddress','cNit','cCompany'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('cRole').value = 'propietario';
+};
+
+window.toggleClientForm = function(){
+  var form = document.getElementById('clientForm');
+  var sel = document.querySelector('.client-selector');
+  var btn = document.querySelector('#clientCard .toggle-btn');
+  clientFormVisible = !clientFormVisible;
+  form.style.display = clientFormVisible ? '' : 'none';
+  sel.style.display = clientFormVisible ? '' : 'none';
+  btn.textContent = clientFormVisible ? 'Ocultar' : 'Mostrar';
+};
+
+function saveCurrentClient(){
+  var name = document.getElementById('cName').value.trim();
+  var phone = document.getElementById('cPhone').value.trim();
+  if(!name || !phone) return null;
+
+  var data = {
+    name:name,
+    phone:phone,
+    email:document.getElementById('cEmail').value.trim(),
+    address:document.getElementById('cAddress').value.trim(),
+    nit:document.getElementById('cNit').value.trim(),
+    company:document.getElementById('cCompany').value.trim()
+  };
+
+  var clients = getClients();
+  var existing = document.getElementById('clientSelect').value;
+
+  if(existing){
+    var idx = clients.findIndex(function(c){return c.id===existing;});
+    if(idx>-1){ clients[idx] = Object.assign(clients[idx], data); }
+    data.id = existing;
+  } else {
+    // check if phone already exists
+    var found = clients.find(function(c){return c.phone===data.phone;});
+    if(found){
+      Object.assign(found, data);
+      data.id = found.id;
+    } else {
+      data.id = genId();
+      clients.push(data);
+    }
+  }
+
+  saveClients(clients);
+  renderClientSelect();
+  document.getElementById('clientSelect').value = data.id;
+  return data;
+}
+
+/* ═══════════════════════════════════════════
+   PROPOSAL UI
+   ═══════════════════════════════════════════ */
+var proposalCount = 0;
+
+window.addProposal = function(prefill){
+  proposalCount++;
+  var n = proposalCount;
+  var p = prefill || {};
+
+  var div = document.createElement('div');
+  div.className = 'proposal';
+  div.id = 'prop_'+n;
+  div.setAttribute('data-n', n);
+
+  var catOpts = '<option value="">Selecciona categoria</option>';
+  CATEGORIES.forEach(function(c){
+    var sel = p.catId===c.id ? ' selected' : '';
+    catOpts += '<option value="'+c.id+'"'+sel+'>'+c.name+'</option>';
+  });
+
+  div.innerHTML =
+    '<div class="proposal-header">'
+    + '<span class="proposal-num">Propuesta #'+n+'</span>'
+    + '<button class="proposal-remove" onclick="removeProposal('+n+')" title="Eliminar">&times;</button>'
+    + '</div>'
+    + '<div class="proposal-grid">'
+    + '<div class="field">'
+    + '  <span class="lbl">Categoria</span>'
+    + '  <select id="cat_'+n+'" onchange="updateServices('+n+')">'+catOpts+'</select>'
+    + '</div>'
+    + '<div class="field">'
+    + '  <span class="lbl">Servicio</span>'
+    + '  <select id="svc_'+n+'" onchange="checkOther('+n+')"><option value="">Selecciona servicio</option></select>'
+    + '</div>'
+    + '<div class="field full" id="otherWrap_'+n+'" style="display:none">'
+    + '  <span class="lbl">Nombre del servicio</span>'
+    + '  <input type="text" id="otherName_'+n+'" placeholder="Escribe el nombre del servicio">'
+    + '</div>'
+    + '<div class="field full">'
+    + '  <span class="lbl">Descripcion / Detalle</span>'
+    + '  <input type="text" id="desc_'+n+'" placeholder="Ej: Pisos superiores, requiere mas trabajo" value="'+(p.description||'')+'">'
+    + '</div>'
+    + '<div class="field">'
+    + '  <span class="lbl">Cantidad (m2)<span class="req">*</span></span>'
+    + '  <input type="number" id="qty_'+n+'" min="0" step="0.01" value="'+(p.qty||'')+'" oninput="calcProposal('+n+')" placeholder="0">'
+    + '</div>'
+    + '<div class="field">'
+    + '  <span class="lbl">Valor venta / m2<span class="req">*</span></span>'
+    + '  <input type="number" id="sale_'+n+'" min="0" step="100" value="'+(p.salePerUnit||'')+'" oninput="calcProposal('+n+')" placeholder="$0">'
+    + '</div>'
+    + '<div class="field cost-field">'
+    + '  <span class="lbl">Costo / m2</span>'
+    + '  <input type="number" id="cost_'+n+'" min="0" step="100" value="'+(p.costPerUnit||'')+'" oninput="calcProposal('+n+')" placeholder="$0">'
+    + '</div>'
+    + '<div class="field cost-field">'
+    + '  <span class="lbl">Margen</span>'
+    + '  <input type="text" id="margin_'+n+'" readonly style="background:#f5f5f5;color:var(--green);font-weight:600" value="--">'
+    + '</div>'
+    + '</div>'
+    + '<div class="proposal-subtotal" id="sub_'+n+'">Subtotal: $0</div>';
+
+  document.getElementById('proposalsList').appendChild(div);
+
+  if(p.catId){
+    updateServices(n);
+    if(p.svcId){
+      setTimeout(function(){
+        document.getElementById('svc_'+n).value = p.svcId;
+        checkOther(n);
+        if(p.otherName){
+          document.getElementById('otherName_'+n).value = p.otherName;
+        }
+        calcProposal(n);
+      },50);
+    }
+  }
+};
+
+window.removeProposal = function(n){
+  var el = document.getElementById('prop_'+n);
+  if(el) el.remove();
+  renderSummary();
+};
+
+window.updateServices = function(n){
+  var catId = document.getElementById('cat_'+n).value;
+  var sel = document.getElementById('svc_'+n);
+  sel.innerHTML = '<option value="">Selecciona servicio</option>';
+
+  if(!catId) return;
+
+  var svcs = getAllServices(catId);
+  svcs.forEach(function(s){
+    var opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name + (s.custom?' *':'');
+    sel.appendChild(opt);
+  });
+
+  var otherOpt = document.createElement('option');
+  otherOpt.value = '__other__';
+  otherOpt.textContent = '-- Otro servicio --';
+  sel.appendChild(otherOpt);
+
+  document.getElementById('otherWrap_'+n).style.display = 'none';
+};
+
+window.checkOther = function(n){
+  var val = document.getElementById('svc_'+n).value;
+  document.getElementById('otherWrap_'+n).style.display = val==='__other__' ? '' : 'none';
+};
+
+window.calcProposal = function(n){
+  var qty = parseFloat(document.getElementById('qty_'+n).value) || 0;
+  var sale = parseFloat(document.getElementById('sale_'+n).value) || 0;
+  var cost = parseFloat(document.getElementById('cost_'+n).value) || 0;
+  var sub = Math.round(qty * sale);
+
+  document.getElementById('sub_'+n).textContent = 'Subtotal: ' + COP(sub);
+
+  // margin
+  var marginEl = document.getElementById('margin_'+n);
+  if(cost > 0 && sale > 0){
+    var marginPct = Math.round(((sale - cost) / sale) * 100);
+    var marginTotal = Math.round(qty * (sale - cost));
+    marginEl.value = marginPct + '% / ' + COP(marginTotal);
+    marginEl.style.color = marginPct >= 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    marginEl.value = '--';
+  }
+
+  renderSummary();
+};
+
+/* ═══════════════════════════════════════════
+   SUMMARY
+   ═══════════════════════════════════════════ */
+function getProposalData(){
+  var items = [];
+  var proposals = document.querySelectorAll('.proposal');
+  proposals.forEach(function(p){
+    var n = p.getAttribute('data-n');
+    var catId = document.getElementById('cat_'+n).value;
+    var svcId = document.getElementById('svc_'+n).value;
+    var otherName = '';
+    var svcName = '';
+
+    if(svcId === '__other__'){
+      otherName = document.getElementById('otherName_'+n).value.trim();
+      svcName = otherName || 'Otro';
+    } else if(svcId){
+      // find service name
+      var allSvcs = catId ? getAllServices(catId) : [];
+      var found = allSvcs.find(function(s){return s.id===svcId;});
+      svcName = found ? found.name : svcId;
+    }
+
+    var qty = parseFloat(document.getElementById('qty_'+n).value) || 0;
+    var sale = parseFloat(document.getElementById('sale_'+n).value) || 0;
+    var cost = parseFloat(document.getElementById('cost_'+n).value) || 0;
+
+    items.push({
+      n: parseInt(n),
+      catId: catId,
+      svcId: svcId,
+      svcName: svcName,
+      otherName: otherName,
+      description: document.getElementById('desc_'+n).value.trim(),
+      qty: qty,
+      salePerUnit: sale,
+      costPerUnit: cost,
+      subtotal: Math.round(qty * sale),
+      costTotal: Math.round(qty * cost)
+    });
+  });
+  return items;
+}
+
+window.renderSummary = function(){
+  var items = getProposalData();
+  var html = '';
+  var grand = 0;
+
+  items.forEach(function(item){
+    var label = item.svcName || 'Propuesta #'+item.n;
+    if(item.description) label += ' — ' + item.description;
+    html += '<div class="summary-line"><span class="label">'
+      + label + ' ('+item.qty+' m2)'
+      + '</span><span>'+COP(item.subtotal)+'</span></div>';
+    grand += item.subtotal;
+  });
+
+  if(!items.length){
+    html = '<div class="empty-state">Agrega propuestas para ver el resumen</div>';
+  }
+
+  document.getElementById('summaryLines').innerHTML = html;
+
+  var showTotal = document.getElementById('showGrandTotal').checked;
+  var totalDiv = document.getElementById('grandTotal');
+  if(showTotal && items.length){
+    totalDiv.style.display = 'flex';
+    document.getElementById('grandTotalVal').textContent = COP(grand);
+  } else {
+    totalDiv.style.display = 'none';
+  }
+};
+
+/* ═══════════════════════════════════════════
+   COSTS TOGGLE
+   ═══════════════════════════════════════════ */
+var showCosts = false;
+
+window.toggleCosts = function(){
+  showCosts = !showCosts;
+  document.getElementById('proposalsCard').classList.toggle('show-costs', showCosts);
+  document.getElementById('btnCosts').classList.toggle('active', showCosts);
+};
+
+/* ═══════════════════════════════════════════
+   SAVE QUOTE
+   ═══════════════════════════════════════════ */
+window.saveQuote = function(){
+  var client = saveCurrentClient();
+  if(!client){
+    toast('Completa nombre y telefono del cliente');
+    return;
+  }
+
+  var items = getProposalData();
+  if(!items.length){
+    toast('Agrega al menos una propuesta');
+    return;
+  }
+
+  // save custom services
+  items.forEach(function(item){
+    if(item.svcId === '__other__' && item.otherName && item.catId){
+      addCustomService(item.catId, item.otherName);
+    }
+  });
+
+  var ref = document.getElementById('quoteRef').textContent || genRef();
+  var role = document.getElementById('cRole').value;
+  var notes = document.getElementById('quoteNotes').value.trim();
+
+  var quote = {
+    id: genId(),
+    ref: ref,
+    clientId: client.id,
+    clientName: client.name,
+    clientRole: role,
+    date: new Date().toISOString(),
+    items: items,
+    notes: notes,
+    total: items.reduce(function(s,i){return s+i.subtotal;},0),
+    totalCost: items.reduce(function(s,i){return s+i.costTotal;},0)
+  };
+
+  var quotes = getQuotes();
+  // check if editing existing
+  var existingIdx = quotes.findIndex(function(q){return q.ref===ref;});
+  if(existingIdx > -1){
+    quotes[existingIdx] = quote;
+  } else {
+    quotes.unshift(quote);
+  }
+  saveQuotes(quotes);
+
+  toast('Cotizacion ' + ref + ' guardada');
+  renderHistory();
+
+  // send telegram notification
+  sendTelegram(quote, client);
+};
+
+/* ═══════════════════════════════════════════
+   NEW QUOTE
+   ═══════════════════════════════════════════ */
+window.newQuote = function(){
+  proposalCount = 0;
+  document.getElementById('proposalsList').innerHTML = '';
+  document.getElementById('quoteNotes').value = '';
+  document.getElementById('quoteRef').textContent = genRef();
+  addProposal();
+  renderSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+  toast('Nueva cotizacion iniciada');
+};
+
+/* ═══════════════════════════════════════════
+   LOAD QUOTE (from history)
+   ═══════════════════════════════════════════ */
+function loadQuote(quoteId){
+  var q = getQuotes().find(function(x){return x.id===quoteId;});
+  if(!q) return;
+
+  // load client
+  var sel = document.getElementById('clientSelect');
+  sel.value = q.clientId || '';
+  if(q.clientId) loadClient();
+  document.getElementById('cRole').value = q.clientRole || 'propietario';
+
+  // set ref
+  document.getElementById('quoteRef').textContent = q.ref;
+
+  // clear proposals
+  proposalCount = 0;
+  document.getElementById('proposalsList').innerHTML = '';
+
+  // load proposals
+  (q.items||[]).forEach(function(item){
+    addProposal(item);
+  });
+
+  document.getElementById('quoteNotes').value = q.notes || '';
+  renderSummary();
+
+  // close history, scroll top
+  document.getElementById('historyPanel').classList.remove('open');
+  document.getElementById('btnHistory').classList.remove('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════
+   HISTORY
+   ═══════════════════════════════════════════ */
+window.toggleHistory = function(){
+  var panel = document.getElementById('historyPanel');
+  panel.classList.toggle('open');
+  document.getElementById('btnHistory').classList.toggle('active');
+  if(panel.classList.contains('open')) renderHistory();
+};
+
+function renderHistory(){
+  var quotes = getQuotes();
+  var container = document.getElementById('historyList');
+
+  if(!quotes.length){
+    container.innerHTML = '<div class="empty-state">No hay cotizaciones guardadas</div>';
+    return;
+  }
+
+  var html = '';
+  quotes.forEach(function(q){
+    var d = new Date(q.date);
+    var dateStr = d.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+    var nItems = (q.items||[]).length;
+    html += '<div class="history-item" onclick="loadQuoteFromHistory(\''+q.id+'\')">'
+      + '<div class="hi-main">'
+      + '<div class="hi-ref">'+q.ref+' &middot; '+nItems+' propuesta'+(nItems!==1?'s':'')+'</div>'
+      + '<div class="hi-client">'+q.clientName+(q.clientRole?' ('+q.clientRole+')':'')+'</div>'
+      + '<div class="hi-date">'+dateStr+'</div>'
+      + '</div>'
+      + '<div class="hi-total">'+COP(q.total)+'</div>'
+      + '<div class="hi-actions">'
+      + '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();duplicateQuote(\''+q.id+'\')">Duplicar</button>'
+      + '<button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteQuote(\''+q.id+'\')">Borrar</button>'
+      + '</div>'
+      + '</div>';
+  });
+  container.innerHTML = html;
+}
+
+window.loadQuoteFromHistory = function(id){ loadQuote(id); };
+
+window.duplicateQuote = function(id){
+  var q = getQuotes().find(function(x){return x.id===id;});
+  if(!q) return;
+  var dup = JSON.parse(JSON.stringify(q));
+  dup.id = genId();
+  dup.ref = genRef();
+  dup.date = new Date().toISOString();
+  var quotes = getQuotes();
+  quotes.unshift(dup);
+  saveQuotes(quotes);
+  renderHistory();
+  toast('Cotizacion duplicada: '+dup.ref);
+};
+
+window.deleteQuote = function(id){
+  var quotes = getQuotes().filter(function(q){return q.id!==id;});
+  saveQuotes(quotes);
+  renderHistory();
+  toast('Cotizacion eliminada');
+};
+
+/* ═══════════════════════════════════════════
+   WHATSAPP
+   ═══════════════════════════════════════════ */
+window.sendWhatsApp = function(){
+  var items = getProposalData();
+  if(!items.length){ toast('Agrega propuestas primero'); return; }
+
+  var name = document.getElementById('cName').value.trim() || 'Cliente';
+  var phone = document.getElementById('cPhone').value.trim();
+  var ref = document.getElementById('quoteRef').textContent;
+  var showTotal = document.getElementById('showGrandTotal').checked;
+  var notes = document.getElementById('quoteNotes').value.trim();
+
+  var lines = [];
+  lines.push('*COTIZACION — LAND MARMOLES*');
+  lines.push('Ref: '+ref);
+  lines.push('Fecha: '+new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}));
+  lines.push('');
+  lines.push('*Cliente:* '+name);
+  if(phone) lines.push('*Telefono:* '+phone);
+  lines.push('');
+
+  var grand = 0;
+  items.forEach(function(item, idx){
+    var label = item.svcName || 'Propuesta #'+(idx+1);
+    lines.push('*'+(idx+1)+'. '+label+'*');
+    if(item.description) lines.push(item.description);
+    lines.push('Area: '+item.qty+' m2');
+    lines.push('Valor: '+COP(item.salePerUnit)+'/m2');
+    lines.push('Subtotal: '+COP(item.subtotal));
+    lines.push('');
+    grand += item.subtotal;
+  });
+
+  if(showTotal){
+    lines.push('---');
+    lines.push('*TOTAL: '+COP(grand)+'*');
+    lines.push('');
+  }
+
+  if(notes){
+    lines.push('_Observaciones: '+notes+'_');
+    lines.push('');
+  }
+
+  lines.push('_Precios sujetos a validacion en sitio._');
+  lines.push('_Lan Marmoles — lanmarmoles.online_');
+
+  var msg = encodeURIComponent(lines.join('\n'));
+
+  // send to client phone or default
+  var target = phone ? phone.replace(/\D/g,'') : NOTIFY.WA_PHONE;
+  if(target.length === 10) target = '57'+target;
+
+  window.open('https://wa.me/'+target+'?text='+msg, '_blank');
+
+  // save the quote too
+  saveQuote();
+};
+
+/* ═══════════════════════════════════════════
+   TELEGRAM NOTIFICATION
+   ═══════════════════════════════════════════ */
+function sendTelegram(quote, client){
+  var lines = [];
+  lines.push('COTIZACION '+quote.ref);
+  lines.push('Cliente: '+(client.name||'-')+' ('+quote.clientRole+')');
+  lines.push('Tel: '+(client.phone||'-'));
+  if(client.company) lines.push('Empresa: '+client.company);
+  lines.push('');
+
+  (quote.items||[]).forEach(function(item, idx){
+    lines.push((idx+1)+'. '+(item.svcName||'--')+': '+item.qty+'m2 x '+COP(item.salePerUnit)+' = '+COP(item.subtotal));
+    if(item.costPerUnit) lines.push('   Costo: '+COP(item.costPerUnit)+'/m2 | Margen: '+COP(item.subtotal - item.costTotal));
+  });
+
+  lines.push('');
+  lines.push('TOTAL VENTA: '+COP(quote.total));
+  if(quote.totalCost) lines.push('TOTAL COSTO: '+COP(quote.totalCost)+' | UTILIDAD: '+COP(quote.total - quote.totalCost));
+
+  var text = encodeURIComponent(lines.join('\n'));
+  var url = 'https://api.telegram.org/bot'+NOTIFY.TG_TOKEN+'/sendMessage?chat_id='+NOTIFY.TG_CHAT+'&text='+text;
+
+  fetch(url).catch(function(){});
+}
+
+/* ═══════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════ */
+function COP(n){
+  if(!n && n!==0) return '$0';
+  return '$'+Math.round(n).toLocaleString('es-CO');
+}
+
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════ */
+function init(){
+  renderClientSelect();
+  document.getElementById('quoteRef').textContent = genRef();
+  addProposal();
+  renderSummary();
+}
+
+init();
+})();
+</script>
+</body>
+</html>
